@@ -2,6 +2,9 @@
  - This is a very basic boilerplate for working with svelte in Deno.
  - It does just enough to get you started, and lets you experiment from there.
  - It might be good to add large changes as a different branch or fork.
+ - One concern that will need to get addressed is here:
+   - https://github.com/afaur/deno-pogo-svelte-starter/blob/master/lib/compile.mjs#L7-L11
+   - This may need to become a regex to fix paths during compilation.
 
 ## Using Make / Just
   - Project uses `Make` or `Just` as task runner.
