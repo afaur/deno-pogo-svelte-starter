@@ -27,10 +27,12 @@
 
 ## Compiling svelte files
   - Typing `make compile` causes the `index.svelte` to build to `out/app.mjs`.
+    - You may also want to use `make compile-debug` to enable debug logging.
     - See `lib/compile.mjs` to adjust/extend this behavior.
 
 ## Running http server
   - Typing `make serve` starts an http server that renders `out/app.mjs`.
+    - You may also want to use `make serve-debug` to enable debug logging.
     - See `lib/serve.mjs` to adjust/extend this behavior. 
     - Currently uses Pogo:
       - https://github.com/sholladay/pogo
