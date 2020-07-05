@@ -4,7 +4,7 @@
  - It might be good to add large changes as a different branch or fork.
  - One concern that will need to get addressed is here:
    - https://github.com/afaur/deno-pogo-svelte-starter/blob/master/lib/compile.mjs#L7-L11
-   - This may need to become a regex to fix paths during compilation.
+   - This may need to become a more all encompassing regex to fix paths during compilation.
 
 ## Using Make / Just
   - Project uses `Make` or `Just` as task runner.
