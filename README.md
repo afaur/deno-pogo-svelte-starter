@@ -6,6 +6,8 @@
    - https://github.com/afaur/deno-pogo-svelte-starter/blob/master/lib/compile.mjs#L7-L11
    - This may need to become a more all encompassing regex to fix paths during compilation.
  - Deno setup instructions: https://deno.land/manual/getting_started/installation
+ - You do not need to run `npm install` or `yarn install`.
+   - Deno installs things remotely from secure endpoints, and caches them after first run.
 
 ## Using Make / Just
   - Project uses `Make` or `Just` as task runner.
