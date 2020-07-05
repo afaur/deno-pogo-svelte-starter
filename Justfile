@@ -1,5 +1,5 @@
 default:
-	@make serve
+	@just serve
 
 serve-debug:
 	@./bin/serve-debug
