@@ -5,6 +5,7 @@
  - One concern that will need to get addressed is here:
    - https://github.com/afaur/deno-pogo-svelte-starter/blob/master/lib/compile.mjs#L7-L11
    - This may need to become a more all encompassing regex to fix paths during compilation.
+ - Deno setup instructions: https://deno.land/manual/getting_started/installation
 
 ## Using Make / Just
   - Project uses `Make` or `Just` as task runner.
