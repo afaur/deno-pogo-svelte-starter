@@ -1,0 +1,3 @@
+#!/bin/bash
+
+deno run --inspect-brk --allow-net -c ./bin/tsconfig.json ./lib/serve.mjs
