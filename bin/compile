@@ -1,3 +1,4 @@
 #!/bin/bash
 
 deno run --allow-read --allow-write ./lib/compile.mjs
+deno fmt out/*
