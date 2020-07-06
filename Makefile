@@ -1,4 +1,4 @@
-.PHONY: serve serve-log serve-break compile compile-log compile-break
+.PHONY: serve serve-log serve-break compile compile-log compile-break test-serve
 
 default:
 	@make serve
@@ -20,3 +20,6 @@ compile-log:
 
 compile-break:
 	@./bin/compile-break
+
+test-serve:
+	@./bin/test-serve

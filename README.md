@@ -76,3 +76,6 @@
     - See `lib/serve.mjs` to adjust/extend this behavior. 
     - Currently uses Pogo:
       - https://github.com/sholladay/pogo
+
+## Running server tests
+  - Typing `make test-serve` tests `lib/serve.mjs`

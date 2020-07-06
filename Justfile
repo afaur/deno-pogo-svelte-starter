@@ -18,3 +18,6 @@ compile-log:
 
 compile-break:
 	@./bin/compile-break
+
+test-serve:
+	@./bin/test-serve
