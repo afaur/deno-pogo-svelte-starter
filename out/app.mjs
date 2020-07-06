@@ -16,7 +16,9 @@ const App = create_ssr_component(($$result, $$props, $$bindings, $$slots) => {
 		);
 	});
 
-	return `${each(items, item => `<div><button>${escape(item)}</button>
+	return `<div>This is here to provide something for a svelte ssr test render to locate</div>
+
+${each(items, item => `<div><button>${escape(item)}</button>
   </div>`)}`;
 });
 

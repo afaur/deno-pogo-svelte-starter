@@ -77,5 +77,8 @@
     - Currently uses Pogo:
       - https://github.com/sholladay/pogo
 
-## Running server tests
-  - Typing `make test-serve` tests `lib/serve.mjs`
+## Running tests
+  - Server
+    - `make test-serve` tests `lib/serve.mjs`.
+  - Svelte SSR
+    - `make test-svelte` tests `out/app.mjs`.

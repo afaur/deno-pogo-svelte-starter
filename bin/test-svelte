@@ -1,0 +1,4 @@
+#!/bin/bash
+
+TEST=1 deno test --allow-env --allow-net --allow-read \
+  -c ./bin/tsconfig.json ./tst/svel/*

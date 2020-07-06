@@ -31,7 +31,7 @@ function get_each_context(ctx, list, i) {
 	return child_ctx;
 }
 
-// (11:0) { #each items as item (item) }
+// (13:0) { #each items as item (item) }
 function create_each_block(key_1, ctx) {
 	let div;
 	let button;
@@ -92,6 +92,9 @@ function create_each_block(key_1, ctx) {
 }
 
 function create_fragment(ctx) {
+	let div;
+	let t0;
+	let t1;
 	let each_blocks = [];
 	let each_1_lookup = new Map();
 	let each_1_anchor;
@@ -106,6 +109,10 @@ function create_fragment(ctx) {
 
 	return {
 		c() {
+			div = element("div");
+			t0 = text("This is here to provide something for a svelte ssr test render to locate");
+			t1 = space();
+
 			for (let i = 0; i < each_blocks.length; i += 1) {
 				each_blocks[i].c();
 			}
@@ -113,6 +120,12 @@ function create_fragment(ctx) {
 			each_1_anchor = empty();
 		},
 		l(nodes) {
+			div = claim_element(nodes, "DIV", {});
+			var div_nodes = children(div);
+			t0 = claim_text(div_nodes, "This is here to provide something for a svelte ssr test render to locate");
+			div_nodes.forEach(detach);
+			t1 = claim_space(nodes);
+
 			for (let i = 0; i < each_blocks.length; i += 1) {
 				each_blocks[i].l(nodes);
 			}
@@ -120,6 +133,10 @@ function create_fragment(ctx) {
 			each_1_anchor = empty();
 		},
 		m(target, anchor) {
+			insert(target, div, anchor);
+			append(div, t0);
+			insert(target, t1, anchor);
+
 			for (let i = 0; i < each_blocks.length; i += 1) {
 				each_blocks[i].m(target, anchor);
 			}
@@ -137,6 +154,9 @@ function create_fragment(ctx) {
 		i: noop,
 		o: noop,
 		d(detaching) {
+			if (detaching) detach(div);
+			if (detaching) detach(t1);
+
 			for (let i = 0; i < each_blocks.length; i += 1) {
 				each_blocks[i].d(detaching);
 			}

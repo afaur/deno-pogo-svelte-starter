@@ -21,3 +21,6 @@ compile-break:
 
 test-serve:
 	@./bin/test-serve
+
+test-svelte:
+	@./bin/test-svelte
