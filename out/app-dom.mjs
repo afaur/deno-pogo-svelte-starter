@@ -4,57 +4,161 @@ import {
 	append,
 	children,
 	claim_element,
+	claim_space,
 	claim_text,
+	create_animation,
 	detach,
 	element,
+	empty,
+	fix_and_destroy_block,
+	fix_position,
 	init,
 	insert,
 	noop,
 	safe_not_equal,
 	set_data,
-	text
-} from "https://unpkg.com/svelte@3.23.2/internal/index.mjs";
+	space,
+	text,
+	update_keyed_each
+} from "/js/svelte/internal/index.mjs";
 
-import { onMount } from 'https://unpkg.com/svelte@3.23.2/internal/index.mjs';
+import { flip } from "/js/svelte/animate/index.mjs";
+import { onMount } from '/js/svelte/internal/index.mjs';
 
-function create_fragment(ctx) {
+function get_each_context(ctx, list, i) {
+	const child_ctx = ctx.slice();
+	child_ctx[3] = list[i];
+	return child_ctx;
+}
+
+// (11:0) { #each items as item (item) }
+function create_each_block(key_1, ctx) {
 	let div;
-	let t;
+	let button;
+	let t0_value = /*item*/ ctx[3] + "";
+	let t0;
+	let t1;
+	let rect;
+	let stop_animation = noop;
 
 	return {
+		key: key_1,
+		first: null,
 		c() {
 			div = element("div");
-			t = text(/*info*/ ctx[0]);
+			button = element("button");
+			t0 = text(t0_value);
+			t1 = space();
+			this.h();
 		},
 		l(nodes) {
 			div = claim_element(nodes, "DIV", {});
 			var div_nodes = children(div);
-			t = claim_text(div_nodes, /*info*/ ctx[0]);
+			button = claim_element(div_nodes, "BUTTON", {});
+			var button_nodes = children(button);
+			t0 = claim_text(button_nodes, t0_value);
+			button_nodes.forEach(detach);
+			t1 = claim_space(div_nodes);
 			div_nodes.forEach(detach);
+			this.h();
+		},
+		h() {
+			this.first = div;
 		},
 		m(target, anchor) {
 			insert(target, div, anchor);
-			append(div, t);
+			append(div, button);
+			append(button, t0);
+			append(div, t1);
 		},
-		p(ctx, [dirty]) {
-			if (dirty & /*info*/ 1) set_data(t, /*info*/ ctx[0]);
+		p(ctx, dirty) {
+			if (dirty & /*items*/ 1 && t0_value !== (t0_value = /*item*/ ctx[3] + "")) set_data(t0, t0_value);
 		},
-		i: noop,
-		o: noop,
+		r() {
+			rect = div.getBoundingClientRect();
+		},
+		f() {
+			fix_position(div);
+			stop_animation();
+		},
+		a() {
+			stop_animation();
+			stop_animation = create_animation(div, rect, flip, /*options*/ ctx[1]);
+		},
 		d(detaching) {
 			if (detaching) detach(div);
 		}
 	};
 }
 
+function create_fragment(ctx) {
+	let each_blocks = [];
+	let each_1_lookup = new Map();
+	let each_1_anchor;
+	let each_value = /*items*/ ctx[0];
+	const get_key = ctx => /*item*/ ctx[3];
+
+	for (let i = 0; i < each_value.length; i += 1) {
+		let child_ctx = get_each_context(ctx, each_value, i);
+		let key = get_key(child_ctx);
+		each_1_lookup.set(key, each_blocks[i] = create_each_block(key, child_ctx));
+	}
+
+	return {
+		c() {
+			for (let i = 0; i < each_blocks.length; i += 1) {
+				each_blocks[i].c();
+			}
+
+			each_1_anchor = empty();
+		},
+		l(nodes) {
+			for (let i = 0; i < each_blocks.length; i += 1) {
+				each_blocks[i].l(nodes);
+			}
+
+			each_1_anchor = empty();
+		},
+		m(target, anchor) {
+			for (let i = 0; i < each_blocks.length; i += 1) {
+				each_blocks[i].m(target, anchor);
+			}
+
+			insert(target, each_1_anchor, anchor);
+		},
+		p(ctx, [dirty]) {
+			if (dirty & /*items*/ 1) {
+				const each_value = /*items*/ ctx[0];
+				for (let i = 0; i < each_blocks.length; i += 1) each_blocks[i].r();
+				each_blocks = update_keyed_each(each_blocks, dirty, get_key, 1, ctx, each_value, each_1_lookup, each_1_anchor.parentNode, fix_and_destroy_block, create_each_block, each_1_anchor, get_each_context);
+				for (let i = 0; i < each_blocks.length; i += 1) each_blocks[i].a();
+			}
+		},
+		i: noop,
+		o: noop,
+		d(detaching) {
+			for (let i = 0; i < each_blocks.length; i += 1) {
+				each_blocks[i].d(detaching);
+			}
+
+			if (detaching) detach(each_1_anchor);
+		}
+	};
+}
+
 function instance($$self, $$props, $$invalidate) {
-	let info = "Loading Component";
+	let next = 0, items = [], options = {};
 
 	onMount(() => {
-		$$invalidate(0, info = "Component Mounted.");
+		setInterval(
+			() => {
+				$$invalidate(0, items = [next++, ...items]);
+			},
+			1000
+		);
 	});
 
-	return [info];
+	return [items, options];
 }
 
 class App extends SvelteComponent {

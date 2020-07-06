@@ -1,3 +1,0 @@
-#!/bin/bash
-
-deno run --allow-net -L debug -c ./bin/tsconfig.json ./lib/serve.mjs

@@ -1,0 +1,3 @@
+[submodule "ven/sveltejs-svelte-deno"]
+	path = ven/sveltejs-svelte-deno
+	url = git@github.com:afaur/sveltejs-svelte-deno.git

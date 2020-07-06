@@ -1,9 +1,17 @@
 <script>
-  let info = 'Loading Component'
+  import { flip } from 'svelte/animate'
 
   import { onMount } from 'svelte'
 
-  onMount(() => { info = 'Component Mounted.' })
+  let next = 0, items = [], options = {}
+
+  onMount(() => { setInterval(() => { items = [next++, ...items] }, 1000) })
 </script>
 
-<div>{ info }</div>
+{ #each items as item (item) }
+  <div animate:flip={options}>
+    <button>
+      {item}
+    </button>
+  </div>
+{ /each }

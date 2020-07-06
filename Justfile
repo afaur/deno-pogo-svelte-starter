@@ -1,14 +1,20 @@
 default:
 	@just serve
 
-serve-debug:
-	@./bin/serve-debug
-
 serve:
 	@./bin/serve
+
+serve-log:
+	@./bin/serve-log
+
+serve-break:
+	@./bin/serve-break
 
 compile:
 	@./bin/compile
 
-compile-debug:
-	@./bin/compile-debug
+compile-log:
+	@./bin/compile-log
+
+compile-break:
+	@./bin/compile-break
