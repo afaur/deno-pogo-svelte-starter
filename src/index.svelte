@@ -4,15 +4,28 @@
 
   export let path = undefined
 
-  let clicked = false
+  let started = false
+
+  let effect = { name: 'fly', conf: { duration: 250, x: 200 } }
+
+  const changeEffect = () => {
+    if (effect.name === 'fly') {
+      effect = { name: 'fade', conf: { duration: 250 } }
+    } else if (effect.name === 'fade') {
+      effect = { name: 'fly', conf: { duration: 250, x: 200 } }
+    }
+  }
+
+  $: loadOrResetText = started && 'Rest Component' || 'Load Component'
 </script>
 
 <div>Current Path: { path }</div>
 
-<button on:click={() => (clicked = true)}>Click Here</button>
+<button on:click={ () => started = !started }>{ loadOrResetText }</button>
+<button on:click={ changeEffect }>Toggle Effect</button>
 
-{ #if clicked }
-  { #await lazy('./component.svelte') then Component }
-    <Component />
+{ #if started }
+  { #await lazy( './listAnimator.svelte' ) then ListAnimator }
+    <ListAnimator effect={ effect } />
   { /await }
 { /if }

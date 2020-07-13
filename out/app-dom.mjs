@@ -20,6 +20,7 @@ import {
   listen,
   mount_component,
   noop,
+  run_all,
   safe_not_equal,
   set_data,
   space,
@@ -40,11 +41,11 @@ function create_if_block(ctx) {
     pending: create_pending_block,
     then: create_then_block,
     catch: create_catch_block,
-    value: 4,
+    value: 7,
     blocks: [, , ],
   };
 
-  handle_promise(promise = /*lazy*/ ctx[2]("/js/component.mjs"), info);
+  handle_promise(promise = /*lazy*/ ctx[4]("/js/listAnimator.mjs"), info);
 
   return {
     c() {
@@ -64,6 +65,12 @@ function create_if_block(ctx) {
     },
     p(new_ctx, dirty) {
       ctx = new_ctx;
+
+      {
+        const child_ctx = ctx.slice();
+        child_ctx[7] = info.resolved;
+        info.block.p(child_ctx, dirty);
+      }
     },
     i(local) {
       if (current) return;
@@ -93,40 +100,48 @@ function create_catch_block(ctx) {
     c: noop,
     l: noop,
     m: noop,
+    p: noop,
     i: noop,
     o: noop,
     d: noop,
   };
 }
 
-// (15:54)      <Component />   { /await }
+// (28:62)      <ListAnimator effect={ effect }
 function create_then_block(ctx) {
-  let component;
+  let listanimator;
   let current;
-  component = new /*Component*/ ctx[4]({});
+  listanimator = new /*ListAnimator*/ ctx[7](
+    { props: { effect: /*effect*/ ctx[2] } },
+  );
 
   return {
     c() {
-      create_component(component.$$.fragment);
+      create_component(listanimator.$$.fragment);
     },
     l(nodes) {
-      claim_component(component.$$.fragment, nodes);
+      claim_component(listanimator.$$.fragment, nodes);
     },
     m(target, anchor) {
-      mount_component(component, target, anchor);
+      mount_component(listanimator, target, anchor);
       current = true;
+    },
+    p(ctx, dirty) {
+      const listanimator_changes = {};
+      if (dirty & /*effect*/ 4) listanimator_changes.effect = /*effect*/ ctx[2];
+      listanimator.$set(listanimator_changes);
     },
     i(local) {
       if (current) return;
-      transition_in(component.$$.fragment, local);
+      transition_in(listanimator.$$.fragment, local);
       current = true;
     },
     o(local) {
-      transition_out(component.$$.fragment, local);
+      transition_out(listanimator.$$.fragment, local);
       current = false;
     },
     d(detaching) {
-      destroy_component(component, detaching);
+      destroy_component(listanimator, detaching);
     },
   };
 }
@@ -137,6 +152,7 @@ function create_pending_block(ctx) {
     c: noop,
     l: noop,
     m: noop,
+    p: noop,
     i: noop,
     o: noop,
     d: noop,
@@ -148,14 +164,17 @@ function create_fragment(ctx) {
   let t0;
   let t1;
   let t2;
-  let button;
+  let button0;
   let t3;
   let t4;
+  let button1;
+  let t5;
+  let t6;
   let if_block_anchor;
   let current;
   let mounted;
   let dispose;
-  let if_block = /*clicked*/ ctx[1] && create_if_block(ctx);
+  let if_block = /*started*/ ctx[1] && create_if_block(ctx);
 
   return {
     c() {
@@ -163,9 +182,12 @@ function create_fragment(ctx) {
       t0 = text("Current Path: ");
       t1 = text(/*path*/ ctx[0]);
       t2 = space();
-      button = element("button");
-      t3 = text("Click Here");
+      button0 = element("button");
+      t3 = text(/*loadOrResetText*/ ctx[3]);
       t4 = space();
+      button1 = element("button");
+      t5 = text("Toggle Effect");
+      t6 = space();
       if (if_block) if_block.c();
       if_block_anchor = empty();
     },
@@ -176,11 +198,16 @@ function create_fragment(ctx) {
       t1 = claim_text(div_nodes, /*path*/ ctx[0]);
       div_nodes.forEach(detach);
       t2 = claim_space(nodes);
-      button = claim_element(nodes, "BUTTON", {});
-      var button_nodes = children(button);
-      t3 = claim_text(button_nodes, "Click Here");
-      button_nodes.forEach(detach);
+      button0 = claim_element(nodes, "BUTTON", {});
+      var button0_nodes = children(button0);
+      t3 = claim_text(button0_nodes, /*loadOrResetText*/ ctx[3]);
+      button0_nodes.forEach(detach);
       t4 = claim_space(nodes);
+      button1 = claim_element(nodes, "BUTTON", {});
+      var button1_nodes = children(button1);
+      t5 = claim_text(button1_nodes, "Toggle Effect");
+      button1_nodes.forEach(detach);
+      t6 = claim_space(nodes);
       if (if_block) if_block.l(nodes);
       if_block_anchor = empty();
     },
@@ -189,26 +216,36 @@ function create_fragment(ctx) {
       append(div, t0);
       append(div, t1);
       insert(target, t2, anchor);
-      insert(target, button, anchor);
-      append(button, t3);
+      insert(target, button0, anchor);
+      append(button0, t3);
       insert(target, t4, anchor);
+      insert(target, button1, anchor);
+      append(button1, t5);
+      insert(target, t6, anchor);
       if (if_block) if_block.m(target, anchor);
       insert(target, if_block_anchor, anchor);
       current = true;
 
       if (!mounted) {
-        dispose = listen(button, "click", /*click_handler*/ ctx[3]);
+        dispose = [
+          listen(button0, "click", /*click_handler*/ ctx[6]),
+          listen(button1, "click", /*changeEffect*/ ctx[5]),
+        ];
+
         mounted = true;
       }
     },
     p(ctx, [dirty]) {
       if (!current || dirty & /*path*/ 1) set_data(t1, /*path*/ ctx[0]);
+      if (!current || dirty & /*loadOrResetText*/ 8) {
+        set_data(t3, /*loadOrResetText*/ ctx[3]);
+      }
 
-      if (/*clicked*/ ctx[1]) {
+      if (/*started*/ ctx[1]) {
         if (if_block) {
           if_block.p(ctx, dirty);
 
-          if (dirty & /*clicked*/ 2) {
+          if (dirty & /*started*/ 2) {
             transition_in(if_block, 1);
           }
         } else {
@@ -239,12 +276,14 @@ function create_fragment(ctx) {
     d(detaching) {
       if (detaching) detach(div);
       if (detaching) detach(t2);
-      if (detaching) detach(button);
+      if (detaching) detach(button0);
       if (detaching) detach(t4);
+      if (detaching) detach(button1);
+      if (detaching) detach(t6);
       if (if_block) if_block.d(detaching);
       if (detaching) detach(if_block_anchor);
       mounted = false;
-      dispose();
+      run_all(dispose);
     },
   };
 }
@@ -258,14 +297,54 @@ function instance($$self, $$props, $$invalidate) {
     });
 
   let { path = undefined } = $$props;
-  let clicked = false;
-  const click_handler = () => $$invalidate(1, clicked = true);
+  let started = false;
+
+  let effect = {
+    name: "fly",
+    conf: { duration: 250, x: 200 },
+  };
+
+  const changeEffect = () => {
+    if (effect.name === "fly") {
+      $$invalidate(2, effect = { name: "fade", conf: { duration: 250 } });
+    } else if (effect.name === "fade") {
+      $$invalidate(
+        2,
+        effect = {
+          name: "fly",
+          conf: { duration: 250, x: 200 },
+        },
+      );
+    }
+  };
+
+  const click_handler = () => $$invalidate(1, started = !started);
 
   $$self.$set = ($$props) => {
     if ("path" in $$props) $$invalidate(0, path = $$props.path);
   };
 
-  return [path, clicked, lazy, click_handler];
+  let loadOrResetText;
+
+  $$self.$$.update = () => {
+    if ($$self.$$.dirty & /*started*/ 2) {
+      $:
+      $$invalidate(
+        3,
+        loadOrResetText = started && "Rest Component" || "Load Component",
+      );
+    }
+  };
+
+  return [
+    path,
+    started,
+    effect,
+    loadOrResetText,
+    lazy,
+    changeEffect,
+    click_handler,
+  ];
 }
 
 class App extends SvelteComponent {

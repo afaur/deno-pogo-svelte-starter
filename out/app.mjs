@@ -15,27 +15,53 @@ const App = create_ssr_component(($$result, $$props, $$bindings, $$slots) => {
     });
 
   let { path = undefined } = $$props;
-  let clicked = false;
+  let started = false;
+
+  let effect = {
+    name: "fly",
+    conf: { duration: 250, x: 200 },
+  };
+
+  const changeEffect = () => {
+    if (effect.name === "fly") {
+      effect = { name: "fade", conf: { duration: 250 } };
+    } else if (effect.name === "fade") {
+      effect = {
+        name: "fly",
+        conf: { duration: 250, x: 200 },
+      };
+    }
+  };
+
   if ($$props.path === void 0 && $$bindings.path && path !== void 0) {
     $$bindings.path(path);
   }
+  let loadOrResetText = started && "Rest Component" || "Load Component";
 
   return `<div>Current Path: ${escape(path)}</div>
 
-<button>Click Here</button>
+<button>${escape(loadOrResetText)}</button>
+<button>Toggle Effect</button>
 
 ${
-    clicked
+    started
       ? `${
         (function (__value) {
           if (is_promise(__value)) return ``;
 
-          return (function (Component) {
+          return (function (ListAnimator) {
             return `
-    ${validate_component(Component, "Component").$$render($$result, {}, {}, {})}
+    ${
+              validate_component(ListAnimator, "ListAnimator").$$render(
+                $$result,
+                { effect },
+                {},
+                {},
+              )
+            }
   `;
           })(__value);
-        })(lazy("./component.mjs"))
+        })(lazy("./listAnimator.mjs"))
       }`
       : ``
   }`;
