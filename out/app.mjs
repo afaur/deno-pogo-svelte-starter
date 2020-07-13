@@ -17,16 +17,21 @@ const App = create_ssr_component(($$result, $$props, $$bindings, $$slots) => {
   let { path = undefined } = $$props;
   let started = false;
 
-  let effect = {
+  let transition = {
     name: "fly",
     conf: { duration: 250, x: 200 },
   };
 
-  const changeEffect = () => {
-    if (effect.name === "fly") {
-      effect = { name: "slide", conf: { duration: 250 } };
-    } else if (effect.name === "slide") {
-      effect = {
+  const changeTransition = () => {
+    if (transition.name === "fly") {
+      transition = { name: "slide", conf: { duration: 250 } };
+    } else if (transition.name === "slide") {
+      transition = {
+        name: "scaleOutVertical",
+        conf: { duration: 250 },
+      };
+    } else if (transition.name === "scaleOutVertical") {
+      transition = {
         name: "fly",
         conf: { duration: 250, x: 200 },
       };
@@ -41,7 +46,8 @@ const App = create_ssr_component(($$result, $$props, $$bindings, $$slots) => {
   return `<div>Current Path: ${escape(path)}</div>
 
 <button>${escape(loadOrResetText)}</button>
-<button>Toggle Effect</button>
+<button>Change Transition</button>
+<span>Current Transition: ${escape(transition.name)}</span>
 
 ${
     started
@@ -49,19 +55,19 @@ ${
         (function (__value) {
           if (is_promise(__value)) return ``;
 
-          return (function (ListAnimator) {
+          return (function (TransitionList) {
             return `
     ${
-              validate_component(ListAnimator, "ListAnimator").$$render(
+              validate_component(TransitionList, "TransitionList").$$render(
                 $$result,
-                { effect },
+                { transition },
                 {},
                 {},
               )
             }
   `;
           })(__value);
-        })(lazy("./listAnimator.mjs"))
+        })(lazy("./transitionList.mjs"))
       }`
       : ``
   }`;

@@ -45,7 +45,7 @@ function create_if_block(ctx) {
     blocks: [, , ],
   };
 
-  handle_promise(promise = /*lazy*/ ctx[4]("/js/listAnimator.mjs"), info);
+  handle_promise(promise = /*lazy*/ ctx[4]("/js/transitionList.mjs"), info);
 
   return {
     c() {
@@ -107,41 +107,44 @@ function create_catch_block(ctx) {
   };
 }
 
-// (28:62)      <ListAnimator effect={ effect }
+// (31:66)      <TransitionList transition={ transition }
 function create_then_block(ctx) {
-  let listanimator;
+  let transitionlist;
   let current;
-  listanimator = new /*ListAnimator*/ ctx[7](
-    { props: { effect: /*effect*/ ctx[2] } },
-  );
+
+  transitionlist = new /*TransitionList*/ ctx[7]({
+    props: { transition: /*transition*/ ctx[2] },
+  });
 
   return {
     c() {
-      create_component(listanimator.$$.fragment);
+      create_component(transitionlist.$$.fragment);
     },
     l(nodes) {
-      claim_component(listanimator.$$.fragment, nodes);
+      claim_component(transitionlist.$$.fragment, nodes);
     },
     m(target, anchor) {
-      mount_component(listanimator, target, anchor);
+      mount_component(transitionlist, target, anchor);
       current = true;
     },
     p(ctx, dirty) {
-      const listanimator_changes = {};
-      if (dirty & /*effect*/ 4) listanimator_changes.effect = /*effect*/ ctx[2];
-      listanimator.$set(listanimator_changes);
+      const transitionlist_changes = {};
+      if (dirty & /*transition*/ 4) {
+        transitionlist_changes.transition = /*transition*/ ctx[2];
+      }
+      transitionlist.$set(transitionlist_changes);
     },
     i(local) {
       if (current) return;
-      transition_in(listanimator.$$.fragment, local);
+      transition_in(transitionlist.$$.fragment, local);
       current = true;
     },
     o(local) {
-      transition_out(listanimator.$$.fragment, local);
+      transition_out(transitionlist.$$.fragment, local);
       current = false;
     },
     d(detaching) {
-      destroy_component(listanimator, detaching);
+      destroy_component(transitionlist, detaching);
     },
   };
 }
@@ -170,6 +173,11 @@ function create_fragment(ctx) {
   let button1;
   let t5;
   let t6;
+  let span;
+  let t7;
+  let t8_value = /*transition*/ ctx[2].name + "";
+  let t8;
+  let t9;
   let if_block_anchor;
   let current;
   let mounted;
@@ -186,8 +194,12 @@ function create_fragment(ctx) {
       t3 = text(/*loadOrResetText*/ ctx[3]);
       t4 = space();
       button1 = element("button");
-      t5 = text("Toggle Effect");
+      t5 = text("Change Transition");
       t6 = space();
+      span = element("span");
+      t7 = text("Current Transition: ");
+      t8 = text(t8_value);
+      t9 = space();
       if (if_block) if_block.c();
       if_block_anchor = empty();
     },
@@ -205,9 +217,15 @@ function create_fragment(ctx) {
       t4 = claim_space(nodes);
       button1 = claim_element(nodes, "BUTTON", {});
       var button1_nodes = children(button1);
-      t5 = claim_text(button1_nodes, "Toggle Effect");
+      t5 = claim_text(button1_nodes, "Change Transition");
       button1_nodes.forEach(detach);
       t6 = claim_space(nodes);
+      span = claim_element(nodes, "SPAN", {});
+      var span_nodes = children(span);
+      t7 = claim_text(span_nodes, "Current Transition: ");
+      t8 = claim_text(span_nodes, t8_value);
+      span_nodes.forEach(detach);
+      t9 = claim_space(nodes);
       if (if_block) if_block.l(nodes);
       if_block_anchor = empty();
     },
@@ -222,6 +240,10 @@ function create_fragment(ctx) {
       insert(target, button1, anchor);
       append(button1, t5);
       insert(target, t6, anchor);
+      insert(target, span, anchor);
+      append(span, t7);
+      append(span, t8);
+      insert(target, t9, anchor);
       if (if_block) if_block.m(target, anchor);
       insert(target, if_block_anchor, anchor);
       current = true;
@@ -229,7 +251,7 @@ function create_fragment(ctx) {
       if (!mounted) {
         dispose = [
           listen(button0, "click", /*click_handler*/ ctx[6]),
-          listen(button1, "click", /*changeEffect*/ ctx[5]),
+          listen(button1, "click", /*changeTransition*/ ctx[5]),
         ];
 
         mounted = true;
@@ -239,6 +261,12 @@ function create_fragment(ctx) {
       if (!current || dirty & /*path*/ 1) set_data(t1, /*path*/ ctx[0]);
       if (!current || dirty & /*loadOrResetText*/ 8) {
         set_data(t3, /*loadOrResetText*/ ctx[3]);
+      }
+      if (
+        (!current || dirty & /*transition*/ 4) &&
+        t8_value !== (t8_value = /*transition*/ ctx[2].name + "")
+      ) {
+        set_data(t8, t8_value);
       }
 
       if (/*started*/ ctx[1]) {
@@ -280,6 +308,8 @@ function create_fragment(ctx) {
       if (detaching) detach(t4);
       if (detaching) detach(button1);
       if (detaching) detach(t6);
+      if (detaching) detach(span);
+      if (detaching) detach(t9);
       if (if_block) if_block.d(detaching);
       if (detaching) detach(if_block_anchor);
       mounted = false;
@@ -299,18 +329,26 @@ function instance($$self, $$props, $$invalidate) {
   let { path = undefined } = $$props;
   let started = false;
 
-  let effect = {
+  let transition = {
     name: "fly",
     conf: { duration: 250, x: 200 },
   };
 
-  const changeEffect = () => {
-    if (effect.name === "fly") {
-      $$invalidate(2, effect = { name: "slide", conf: { duration: 250 } });
-    } else if (effect.name === "slide") {
+  const changeTransition = () => {
+    if (transition.name === "fly") {
+      $$invalidate(2, transition = { name: "slide", conf: { duration: 250 } });
+    } else if (transition.name === "slide") {
       $$invalidate(
         2,
-        effect = {
+        transition = {
+          name: "scaleOutVertical",
+          conf: { duration: 250 },
+        },
+      );
+    } else if (transition.name === "scaleOutVertical") {
+      $$invalidate(
+        2,
+        transition = {
           name: "fly",
           conf: { duration: 250, x: 200 },
         },
@@ -339,10 +377,10 @@ function instance($$self, $$props, $$invalidate) {
   return [
     path,
     started,
-    effect,
+    transition,
     loadOrResetText,
     lazy,
-    changeEffect,
+    changeTransition,
     click_handler,
   ];
 }
