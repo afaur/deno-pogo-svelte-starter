@@ -1,14 +1,13 @@
 <script>
   import { onMount } from 'svelte'
 
-  import { fly, fade } from 'svelte/transition'
-  import { flip } from 'svelte/animate'
+  import { fly, slide } from 'svelte/transition'
 
-  export let effect = { name: 'fade', conf: { duration: 250 } }
+  export let effect = { name: 'slide', conf: { duration: 250 } }
 
   let next = 0, items = [], intervalId = undefined
 
-  const effects = { fly, fade }
+  const effects = { fly, slide }
 
   const intro = node => effects[effect.name](node, effect.conf)
 
@@ -36,7 +35,7 @@
 </script>
 
 { #each items as item (item) }
-  <div animate:flip in:intro>
+  <div in:intro>
     <button>{ item }</button>
   </div>
 { /each }

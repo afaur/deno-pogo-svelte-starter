@@ -7,13 +7,11 @@ import {
   claim_element,
   claim_space,
   claim_text,
-  create_animation,
   create_in_transition,
+  destroy_block,
   detach,
   element,
   empty,
-  fix_and_destroy_block,
-  fix_position,
   init,
   insert,
   noop,
@@ -26,8 +24,7 @@ import {
 } from "/js/svelte/internal/index.mjs";
 
 import { onMount } from "/js/svelte/internal/index.mjs";
-import { fly, fade } from "/js/svelte/transition/index.mjs";
-import { flip } from "/js/svelte/animate/index.mjs";
+import { fly, slide } from "/js/svelte/transition/index.mjs";
 
 function get_each_context(ctx, list, i) {
   const child_ctx = ctx.slice();
@@ -35,7 +32,7 @@ function get_each_context(ctx, list, i) {
   return child_ctx;
 }
 
-// (38:0) { #each items as item (item) }
+// (37:0) { #each items as item (item) }
 function create_each_block(key_1, ctx) {
   let div;
   let button;
@@ -43,8 +40,6 @@ function create_each_block(key_1, ctx) {
   let t0;
   let t1;
   let div_intro;
-  let rect;
-  let stop_animation = noop;
 
   return {
     key: key_1,
@@ -82,17 +77,6 @@ function create_each_block(key_1, ctx) {
       ) {
         set_data(t0, t0_value);
       }
-    },
-    r() {
-      rect = div.getBoundingClientRect();
-    },
-    f() {
-      fix_position(div);
-      stop_animation();
-    },
-    a() {
-      stop_animation();
-      stop_animation = create_animation(div, rect, flip, {});
     },
     i(local) {
       if (!div_intro) {
@@ -147,7 +131,6 @@ function create_fragment(ctx) {
     p(ctx, [dirty]) {
       if (dirty & /*items*/ 1) {
         const each_value = /*items*/ ctx[0];
-        for (let i = 0; i < each_blocks.length; i += 1) each_blocks[i].r();
         each_blocks = update_keyed_each(
           each_blocks,
           dirty,
@@ -157,12 +140,11 @@ function create_fragment(ctx) {
           each_value,
           each_1_lookup,
           each_1_anchor.parentNode,
-          fix_and_destroy_block,
+          destroy_block,
           create_each_block,
           each_1_anchor,
           get_each_context,
         );
-        for (let i = 0; i < each_blocks.length; i += 1) each_blocks[i].a();
       }
     },
     i(local) {
@@ -182,9 +164,9 @@ function create_fragment(ctx) {
 }
 
 function instance($$self, $$props, $$invalidate) {
-  let { effect = { name: "fade", conf: { duration: 250 } } } = $$props;
+  let { effect = { name: "slide", conf: { duration: 250 } } } = $$props;
   let next = 0, items = [], intervalId = undefined;
-  const effects = { fly, fade };
+  const effects = { fly, slide };
   const intro = (node) => effects[effect.name](node, effect.conf);
 
   const incrementItems = () => {

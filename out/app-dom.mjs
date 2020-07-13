@@ -306,8 +306,8 @@ function instance($$self, $$props, $$invalidate) {
 
   const changeEffect = () => {
     if (effect.name === "fly") {
-      $$invalidate(2, effect = { name: "fade", conf: { duration: 250 } });
-    } else if (effect.name === "fade") {
+      $$invalidate(2, effect = { name: "slide", conf: { duration: 250 } });
+    } else if (effect.name === "slide") {
       $$invalidate(
         2,
         effect = {

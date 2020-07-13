@@ -24,8 +24,8 @@ const App = create_ssr_component(($$result, $$props, $$bindings, $$slots) => {
 
   const changeEffect = () => {
     if (effect.name === "fly") {
-      effect = { name: "fade", conf: { duration: 250 } };
-    } else if (effect.name === "fade") {
+      effect = { name: "slide", conf: { duration: 250 } };
+    } else if (effect.name === "slide") {
       effect = {
         name: "fly",
         conf: { duration: 250, x: 200 },

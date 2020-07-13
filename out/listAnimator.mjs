@@ -8,15 +8,14 @@ import {
 import { onMount } from "../ven/sveltejs-svelte-deno/internal/index-ssr.mjs";
 import {
   fly,
-  fade,
+  slide,
 } from "../ven/sveltejs-svelte-deno/transition/index-ssr.mjs";
-import { flip } from "../ven/sveltejs-svelte-deno/animate/index-ssr.mjs";
 
 const ListAnimator = create_ssr_component(
   ($$result, $$props, $$bindings, $$slots) => {
-    let { effect = { name: "fade", conf: { duration: 250 } } } = $$props;
+    let { effect = { name: "slide", conf: { duration: 250 } } } = $$props;
     let next = 0, items = [], intervalId = undefined;
-    const effects = { fly, fade };
+    const effects = { fly, slide };
     const intro = (node) => effects[effect.name](node, effect.conf);
 
     const incrementItems = () => {
