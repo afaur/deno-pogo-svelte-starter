@@ -1,19 +1,18 @@
 <script>
-  import { flip } from 'svelte/animate'
+  const lazy = file => import(file).then(module => module.default)
+    .catch(e => { const err = (e ?? 'throw'); console.log(err); throw err })
 
-  import { onMount } from 'svelte'
+  export let path = undefined
 
-  let next = 0, items = [], options = {}
-
-  onMount(() => { setInterval(() => { items = [next++, ...items] }, 1000) })
+  let clicked = false
 </script>
 
-<div>This is here to provide something for a svelte ssr test render to locate</div>
+<div>Current Path: { path }</div>
 
-{ #each items as item (item) }
-  <div animate:flip={options}>
-    <button>
-      {item}
-    </button>
-  </div>
-{ /each }
+<button on:click={() => (clicked = true)}>Click Here</button>
+
+{ #if clicked }
+  { #await lazy('./component.svelte') then Component }
+    <Component />
+  { /await }
+{ /if }

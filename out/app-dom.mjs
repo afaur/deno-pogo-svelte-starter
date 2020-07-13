@@ -2,96 +2,144 @@
 import {
   SvelteComponent,
   append,
+  check_outros,
   children,
+  claim_component,
   claim_element,
   claim_space,
   claim_text,
-  create_animation,
+  create_component,
+  destroy_component,
   detach,
   element,
   empty,
-  fix_and_destroy_block,
-  fix_position,
+  group_outros,
+  handle_promise,
   init,
   insert,
+  listen,
+  mount_component,
   noop,
   safe_not_equal,
   set_data,
   space,
   text,
-  update_keyed_each,
+  transition_in,
+  transition_out,
 } from "/js/svelte/internal/index.mjs";
 
-import { flip } from "/js/svelte/animate/index.mjs";
-import { onMount } from "/js/svelte/internal/index.mjs";
+function create_if_block(ctx) {
+  let await_block_anchor;
+  let promise;
+  let current;
 
-function get_each_context(ctx, list, i) {
-  const child_ctx = ctx.slice();
-  child_ctx[3] = list[i];
-  return child_ctx;
-}
+  let info = {
+    ctx,
+    current: null,
+    token: null,
+    pending: create_pending_block,
+    then: create_then_block,
+    catch: create_catch_block,
+    value: 4,
+    blocks: [, , ],
+  };
 
-// (13:0) { #each items as item (item) }
-function create_each_block(key_1, ctx) {
-  let div;
-  let button;
-  let t0_value = /*item*/ ctx[3] + "";
-  let t0;
-  let t1;
-  let rect;
-  let stop_animation = noop;
+  handle_promise(promise = /*lazy*/ ctx[2]("/js/component.mjs"), info);
 
   return {
-    key: key_1,
-    first: null,
     c() {
-      div = element("div");
-      button = element("button");
-      t0 = text(t0_value);
-      t1 = space();
-      this.h();
+      await_block_anchor = empty();
+      info.block.c();
     },
     l(nodes) {
-      div = claim_element(nodes, "DIV", {});
-      var div_nodes = children(div);
-      button = claim_element(div_nodes, "BUTTON", {});
-      var button_nodes = children(button);
-      t0 = claim_text(button_nodes, t0_value);
-      button_nodes.forEach(detach);
-      t1 = claim_space(div_nodes);
-      div_nodes.forEach(detach);
-      this.h();
-    },
-    h() {
-      this.first = div;
+      await_block_anchor = empty();
+      info.block.l(nodes);
     },
     m(target, anchor) {
-      insert(target, div, anchor);
-      append(div, button);
-      append(button, t0);
-      append(div, t1);
+      insert(target, await_block_anchor, anchor);
+      info.block.m(target, info.anchor = anchor);
+      info.mount = () => await_block_anchor.parentNode;
+      info.anchor = await_block_anchor;
+      current = true;
     },
-    p(ctx, dirty) {
-      if (
-        dirty & /*items*/ 1 && t0_value !== (t0_value = /*item*/ ctx[3] + "")
-      ) {
-        set_data(t0, t0_value);
+    p(new_ctx, dirty) {
+      ctx = new_ctx;
+    },
+    i(local) {
+      if (current) return;
+      transition_in(info.block);
+      current = true;
+    },
+    o(local) {
+      for (let i = 0; i < 3; i += 1) {
+        const block = info.blocks[i];
+        transition_out(block);
       }
-    },
-    r() {
-      rect = div.getBoundingClientRect();
-    },
-    f() {
-      fix_position(div);
-      stop_animation();
-    },
-    a() {
-      stop_animation();
-      stop_animation = create_animation(div, rect, flip, /*options*/ ctx[1]);
+
+      current = false;
     },
     d(detaching) {
-      if (detaching) detach(div);
+      if (detaching) detach(await_block_anchor);
+      info.block.d(detaching);
+      info.token = null;
+      info = null;
     },
+  };
+}
+
+// (1:0) <script>   const lazy = file => import(file).then(module => module.default)     .catch(e => { const err = (e ?? 'throw'); console.log(err); throw err }
+function create_catch_block(ctx) {
+  return {
+    c: noop,
+    l: noop,
+    m: noop,
+    i: noop,
+    o: noop,
+    d: noop,
+  };
+}
+
+// (15:54)      <Component />   { /await }
+function create_then_block(ctx) {
+  let component;
+  let current;
+  component = new /*Component*/ ctx[4]({});
+
+  return {
+    c() {
+      create_component(component.$$.fragment);
+    },
+    l(nodes) {
+      claim_component(component.$$.fragment, nodes);
+    },
+    m(target, anchor) {
+      mount_component(component, target, anchor);
+      current = true;
+    },
+    i(local) {
+      if (current) return;
+      transition_in(component.$$.fragment, local);
+      current = true;
+    },
+    o(local) {
+      transition_out(component.$$.fragment, local);
+      current = false;
+    },
+    d(detaching) {
+      destroy_component(component, detaching);
+    },
+  };
+}
+
+// (1:0) <script>   const lazy = file => import(file).then(module => module.default)     .catch(e => { const err = (e ?? 'throw'); console.log(err); throw err }
+function create_pending_block(ctx) {
+  return {
+    c: noop,
+    l: noop,
+    m: noop,
+    i: noop,
+    o: noop,
+    d: noop,
   };
 }
 
@@ -99,114 +147,131 @@ function create_fragment(ctx) {
   let div;
   let t0;
   let t1;
-  let each_blocks = [];
-  let each_1_lookup = new Map();
-  let each_1_anchor;
-  let each_value = /*items*/ ctx[0];
-  const get_key = (ctx) => /*item*/ ctx[3];
-
-  for (let i = 0; i < each_value.length; i += 1) {
-    let child_ctx = get_each_context(ctx, each_value, i);
-    let key = get_key(child_ctx);
-    each_1_lookup.set(key, each_blocks[i] = create_each_block(key, child_ctx));
-  }
+  let t2;
+  let button;
+  let t3;
+  let t4;
+  let if_block_anchor;
+  let current;
+  let mounted;
+  let dispose;
+  let if_block = /*clicked*/ ctx[1] && create_if_block(ctx);
 
   return {
     c() {
       div = element("div");
-      t0 = text(
-        "This is here to provide something for a svelte ssr test render to locate",
-      );
-      t1 = space();
-
-      for (let i = 0; i < each_blocks.length; i += 1) {
-        each_blocks[i].c();
-      }
-
-      each_1_anchor = empty();
+      t0 = text("Current Path: ");
+      t1 = text(/*path*/ ctx[0]);
+      t2 = space();
+      button = element("button");
+      t3 = text("Click Here");
+      t4 = space();
+      if (if_block) if_block.c();
+      if_block_anchor = empty();
     },
     l(nodes) {
       div = claim_element(nodes, "DIV", {});
       var div_nodes = children(div);
-      t0 = claim_text(
-        div_nodes,
-        "This is here to provide something for a svelte ssr test render to locate",
-      );
+      t0 = claim_text(div_nodes, "Current Path: ");
+      t1 = claim_text(div_nodes, /*path*/ ctx[0]);
       div_nodes.forEach(detach);
-      t1 = claim_space(nodes);
-
-      for (let i = 0; i < each_blocks.length; i += 1) {
-        each_blocks[i].l(nodes);
-      }
-
-      each_1_anchor = empty();
+      t2 = claim_space(nodes);
+      button = claim_element(nodes, "BUTTON", {});
+      var button_nodes = children(button);
+      t3 = claim_text(button_nodes, "Click Here");
+      button_nodes.forEach(detach);
+      t4 = claim_space(nodes);
+      if (if_block) if_block.l(nodes);
+      if_block_anchor = empty();
     },
     m(target, anchor) {
       insert(target, div, anchor);
       append(div, t0);
-      insert(target, t1, anchor);
+      append(div, t1);
+      insert(target, t2, anchor);
+      insert(target, button, anchor);
+      append(button, t3);
+      insert(target, t4, anchor);
+      if (if_block) if_block.m(target, anchor);
+      insert(target, if_block_anchor, anchor);
+      current = true;
 
-      for (let i = 0; i < each_blocks.length; i += 1) {
-        each_blocks[i].m(target, anchor);
+      if (!mounted) {
+        dispose = listen(button, "click", /*click_handler*/ ctx[3]);
+        mounted = true;
       }
-
-      insert(target, each_1_anchor, anchor);
     },
     p(ctx, [dirty]) {
-      if (dirty & /*items*/ 1) {
-        const each_value = /*items*/ ctx[0];
-        for (let i = 0; i < each_blocks.length; i += 1) each_blocks[i].r();
-        each_blocks = update_keyed_each(
-          each_blocks,
-          dirty,
-          get_key,
-          1,
-          ctx,
-          each_value,
-          each_1_lookup,
-          each_1_anchor.parentNode,
-          fix_and_destroy_block,
-          create_each_block,
-          each_1_anchor,
-          get_each_context,
-        );
-        for (let i = 0; i < each_blocks.length; i += 1) each_blocks[i].a();
+      if (!current || dirty & /*path*/ 1) set_data(t1, /*path*/ ctx[0]);
+
+      if (/*clicked*/ ctx[1]) {
+        if (if_block) {
+          if_block.p(ctx, dirty);
+
+          if (dirty & /*clicked*/ 2) {
+            transition_in(if_block, 1);
+          }
+        } else {
+          if_block = create_if_block(ctx);
+          if_block.c();
+          transition_in(if_block, 1);
+          if_block.m(if_block_anchor.parentNode, if_block_anchor);
+        }
+      } else if (if_block) {
+        group_outros();
+
+        transition_out(if_block, 1, 1, () => {
+          if_block = null;
+        });
+
+        check_outros();
       }
     },
-    i: noop,
-    o: noop,
+    i(local) {
+      if (current) return;
+      transition_in(if_block);
+      current = true;
+    },
+    o(local) {
+      transition_out(if_block);
+      current = false;
+    },
     d(detaching) {
       if (detaching) detach(div);
-      if (detaching) detach(t1);
-
-      for (let i = 0; i < each_blocks.length; i += 1) {
-        each_blocks[i].d(detaching);
-      }
-
-      if (detaching) detach(each_1_anchor);
+      if (detaching) detach(t2);
+      if (detaching) detach(button);
+      if (detaching) detach(t4);
+      if (if_block) if_block.d(detaching);
+      if (detaching) detach(if_block_anchor);
+      mounted = false;
+      dispose();
     },
   };
 }
 
 function instance($$self, $$props, $$invalidate) {
-  let next = 0, items = [], options = {};
+  const lazy = (file) =>
+    import(file).then((module) => module.default).catch((e) => {
+      const err = e ?? "throw";
+      console.log(err);
+      throw err;
+    });
 
-  onMount(() => {
-    setInterval(
-      () => {
-        $$invalidate(0, items = [next++, ...items]);
-      },
-      1000,
-    );
-  });
+  let { path = undefined } = $$props;
+  let clicked = false;
+  const click_handler = () => $$invalidate(1, clicked = true);
 
-  return [items, options];
+  $$self.$set = ($$props) => {
+    if ("path" in $$props) $$invalidate(0, path = $$props.path);
+  };
+
+  return [path, clicked, lazy, click_handler];
 }
 
 class App extends SvelteComponent {
   constructor(options) {
     super();
-    init(this, options, instance, create_fragment, safe_not_equal, {});
+    init(this, options, instance, create_fragment, safe_not_equal, { path: 0 });
   }
 }
 

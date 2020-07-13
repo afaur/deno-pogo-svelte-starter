@@ -1,6 +1,9 @@
 default:
 	@just serve
 
+dev:
+	@./bin/dev
+
 serve:
 	@./bin/serve
 

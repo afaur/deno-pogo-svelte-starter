@@ -1,7 +1,10 @@
-.PHONY: serve serve-log serve-break compile compile-log compile-break test-serve test-svelte
+.PHONY: dev serve serve-log serve-break compile compile-log compile-break test-serve test-svelte
 
 default:
 	@make serve
+
+dev:
+	@./bin/dev
 
 serve:
 	@./bin/serve
