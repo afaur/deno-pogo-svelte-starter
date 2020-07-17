@@ -18,7 +18,7 @@
     }
   }
 
-  $: loadOrResetText = started && 'Rest Component' || 'Load Component'
+  $: loadOrResetText = started && 'Reset Component' || 'Load Component'
 </script>
 
 <div>Current Path: { path }</div>
